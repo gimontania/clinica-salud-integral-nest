@@ -1,0 +1,95 @@
+//generamos el cliente de prisma que usaremos desde NestJS
+generator client {
+    provider = "prisma-client"
+    output   = "../generated/prisma"
+}
+
+//configuración de la conexión a PostgreSQL
+//la url de conexión se obtiene desde DATABASE_URL
+datasource db {
+    provider = "postgresql"
+}
+
+//especialidades médicas
+model Especialidad {
+    id      Int      @id @default(autoincrement())
+    name    String   @unique
+    medicos Medico[]
+
+    //nombre de la tabla en PostgreSQL
+    @@map("especialidades")
+}
+
+//médicos de la clínica
+model Medico {
+    id             Int    @id @default(autoincrement())
+    firstName      String
+    lastName       String
+    email          String @unique
+    especialidadId Int
+
+    //relación con la especialidad
+    especialidad Especialidad @relation(fields: [especialidadId], references: [id])
+
+    //un médico puede tener muchas citas
+    citas Cita[]
+
+    @@map("medicos")
+}
+
+//pacientes de la clínica
+model Paciente {
+    id              Int      @id @default(autoincrement())
+    firstName       String
+    lastName        String
+    email           String   @unique
+    fechaNacimiento DateTime
+
+    //un paciente puede tener muchas citas
+    citas Cita[]
+
+    @@map("pacientes")
+}
+
+//estados posibles de una cita
+enum EstadoCita {
+    PROGRAMADA
+    COMPLETADA
+    CANCELADA
+}
+
+//citas médicas
+model Cita {
+    id         Int      @id @default(autoincrement())
+    pacienteId Int
+    medicoId   Int
+    fecha      DateTime
+
+    //si no indicamos un estado, comienza como programada
+    estado EstadoCita @default(PROGRAMADA)
+
+    //relación con paciente
+    paciente Paciente @relation(fields: [pacienteId], references: [id])
+
+    //relación con médico
+    medico Medico @relation(fields: [medicoId], references: [id])
+
+    @@map("citas")
+}
+
+//roles de los usuarios del sistema
+enum Role {
+    RECEPCIONISTA
+    MEDICO
+    GERENCIA
+}
+
+//usuarios que pueden ingresar al sistema
+model User {
+    id       Int    @id @default(autoincrement())
+    email    String @unique
+    password String
+    role     Role
+
+    @@map("users")
+}
