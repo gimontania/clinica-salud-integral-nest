@@ -2,6 +2,8 @@ import "dotenv/config"; // carga las variables del archivo .env
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from "@nestjs/common";
 import { AppModule } from './app.module';
+import { PrismaExceptionFilter } from "./prisma/prisma-exception.filter";
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,6 +15,9 @@ async function bootstrap() {
       transform: true, //transforma los datos recibidos al tipo del dto
     }),
   );
+
+  //registra el filtro para manejar errores conocidos de prisma
+  app.useGlobalFilters(new PrismaExceptionFilter());
   
   await app.listen(process.env.PORT ?? 3000); //inicia el servidor
 }
