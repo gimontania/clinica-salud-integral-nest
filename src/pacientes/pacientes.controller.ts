@@ -1,5 +1,7 @@
 import { Body, Controller, Delete,  Get, NotFoundException, Param, Post, Put, } from '@nestjs/common';
 import { PacientesService } from './pacientes.service';
+import { CreatePacienteDto } from './dto/create-paciente.dto';
+import { UpdatePacienteDto } from './dto/update-paciente.dto';
 
 
 //controlador encargado de las rutas de pacientes
@@ -28,16 +30,16 @@ export class PacientesController {
 
     //post, pacientes > crea un nuevo paciente
     @Post()
-    create(@Body() body: any) {
+    create(@Body() dto: CreatePacienteDto) {
         return this.pacientesService.create({
-            ...body,
-            fechaNacimiento: new Date(body.fechaNacimiento),            
+            ...dto,
+            fechaNacimiento: new Date(dto.fechaNacimiento),            
         });
     }
 
     //put, pacientes/:id -> actualiza un paciente
     @Put(':id') 
-    async update(@Param('id') id: string, @Body() body: any) {
+    async update(@Param('id') id: string, @Body() dto: UpdatePacienteDto) {
         const paciente = await this.pacientesService.findOne(Number(id));
 
         //si no existe, respondemos 404
@@ -45,10 +47,14 @@ export class PacientesController {
             throw new NotFoundException('Paciente no encontrado');
         }
 
+        //separamos la fecha del resto de los datos
+        const { fechaNacimiento, ...datos } = dto;
+
         return this.pacientesService.update(Number(id), {
-            ...body,
-            ...(body.fechaNacimiento && {
-                fechaNacimiento: new Date(body.fechaNacimiento),
+            ...datos,
+            //convertimos la fecha de string a Date
+            ...(fechaNacimiento && {
+                fechaNacimiento: new Date(fechaNacimiento),
             }),
         });        
     }

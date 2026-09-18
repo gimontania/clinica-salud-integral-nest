@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from "../prisma/prisma.service";
 
 
@@ -26,6 +26,11 @@ export class PacientesService {
         email: string
         fechaNacimiento: Date
     }) {
+        //la fecha de nacimiento no puede ser futura
+        if (data.fechaNacimiento > new Date()) {
+            throw new BadRequestException('La fecha de nacimiento no puede ser futura',);
+        }
+
         return this.prisma.paciente.create({
             data,
         })
