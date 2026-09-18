@@ -1,5 +1,7 @@
 import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put } from '@nestjs/common';
 import { MedicosService } from "./medicos.service";
+import { CreateMedicoDto } from './dto/create-medico.dto';
+import { UpdateMedicoDto } from './dto/update-medico.dto';
 
 
 //controlador encargado de las rutas de médicos
@@ -28,13 +30,13 @@ export class MedicosController {
 
     //post, medicos -> crea un nuevo médico
     @Post()
-    create(@Body() body: any) {
-        return this.medicosService.create(body);
+    create(@Body() dto: CreateMedicoDto) {
+        return this.medicosService.create(dto);
     }
 
     //put, medicos/:id -> actualiza un médico
     @Put(':id')
-    async update(@Param('id') id: string, @Body() body: any) {
+    async update(@Param('id') id: string, @Body() dto: UpdateMedicoDto) {
         const medico = await this.medicosService.findOne(Number(id));
 
         //404 si no existe
@@ -42,9 +44,7 @@ export class MedicosController {
             throw new NotFoundException('Médico no encontrado');
         }
 
-        return this.medicosService.update(Number(id), {
-            ...body,
-        });
+        return this.medicosService.update(Number(id), dto);
     }
 
     //delte. medicos/:id -> elimina un médico
@@ -59,10 +59,6 @@ export class MedicosController {
 
         return this.medicosService.remove(Number(id));
     }
-
-
-
-
 
 
 }
