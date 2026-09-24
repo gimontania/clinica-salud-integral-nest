@@ -2,20 +2,25 @@ import { Body, Controller, Delete,  Get, NotFoundException, Param, Post, Put, } 
 import { PacientesService } from './pacientes.service';
 import { CreatePacienteDto } from './dto/create-paciente.dto';
 import { UpdatePacienteDto } from './dto/update-paciente.dto';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+
 
 
 //controlador encargado de las rutas de pacientes
+@ApiTags('Pacientes')
 @Controller('pacientes')
 export class PacientesController {
     constructor(private readonly pacientesService: PacientesService) {}
 
     //get, pacientes -> devuelve todos los pacientes
+    @ApiOperation({ summary: 'Lista todos los pacientes' })
     @Get()
     findAll() {
         return this.pacientesService.findAll();
     }
 
     //get, pacientes/:id -> busca un paciente por su id
+    @ApiOperation({ summary: 'Busca un paciente por su ID'})
     @Get(':id')
     async findOne(@Param('id') id: string) {
         const paciente = await this.pacientesService.findOne(Number(id));
@@ -29,6 +34,7 @@ export class PacientesController {
     }
 
     //post, pacientes > crea un nuevo paciente
+    @ApiOperation({ summary: 'Crea un nuevo paciente' })
     @Post()
     create(@Body() dto: CreatePacienteDto) {
         return this.pacientesService.create({
@@ -38,6 +44,7 @@ export class PacientesController {
     }
 
     //put, pacientes/:id -> actualiza un paciente
+    @ApiOperation({ summary: 'Actualiza un paciente por su Id'})
     @Put(':id') 
     async update(@Param('id') id: string, @Body() dto: UpdatePacienteDto) {
         const paciente = await this.pacientesService.findOne(Number(id));
@@ -60,6 +67,7 @@ export class PacientesController {
     }
 
     //delete, pacientes/:id -> elimina un paciente
+    @ApiOperation({ summary: 'Elimina un paciente por su Id'})
     @Delete(':id')
     async remove(@Param('id') id: string) {
         const paciente = await this.pacientesService.findOne(Number(id));
