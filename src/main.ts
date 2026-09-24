@@ -3,7 +3,8 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from "@nestjs/common";
 import { AppModule } from './app.module';
 import { PrismaExceptionFilter } from "./prisma/prisma-exception.filter";
-import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger"
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { LoggingInterceptor } from "./common/logging.interceptor";
 
 
 async function bootstrap() {
@@ -34,8 +35,12 @@ async function bootstrap() {
     
   //registra el filtro para manejar errores conocidos de prisma
   app.useGlobalFilters(new PrismaExceptionFilter());
-  
+
+  //registra el interceptor de loggin para todas las peticiones
+  app.useGlobalInterceptors(new LoggingInterceptor());
+
   await app.listen(process.env.PORT ?? 3000); //inicia el servidor
+  
 }
 
 void bootstrap();
