@@ -5,6 +5,7 @@ import { AppModule } from './app.module';
 import { PrismaExceptionFilter } from "./prisma/prisma-exception.filter";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { LoggingInterceptor } from "./common/logging.interceptor";
+import { ConfigService } from "@nestjs/config";
 
 
 async function bootstrap() {
@@ -39,7 +40,9 @@ async function bootstrap() {
   //registra el interceptor de loggin para todas las peticiones
   app.useGlobalInterceptors(new LoggingInterceptor());
 
-  await app.listen(process.env.PORT ?? 3000); //inicia el servidor
+  const configService = app.get(ConfigService);
+
+  await app.listen(configService.get<number>('PORT') ?? 3000); //inicia el servidor
   
 }
 
